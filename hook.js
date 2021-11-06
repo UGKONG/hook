@@ -144,14 +144,14 @@ export const usePwDecoding = (str = '') => {
 
 // 해당 월 (dt: Object) : String[]
 export const useMonthSpan = (dt = new Date()) => {
-  let TODAY = useStringDate(dt);
+  let TODAY = useDateFormat(dt);
   let date = new Date(dt);
   date.setDate(1);
-  let START_DT = useStringDate(date);
+  let START_DT = useDateFormat(date);
   date.setMonth(date.getMonth() + 1);
   date.setDate(1);
   date.setDate(date.getDate() - 1);
-  let END_DT = useStringDate(date);
+  let END_DT = useDateFormat(date);
 
   return [START_DT, END_DT, TODAY];
 }
