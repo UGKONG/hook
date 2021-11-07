@@ -1,36 +1,81 @@
-// 비동기 콜백 함수 ({ url:String, data:Object, loadEl:String, success: Function, error: Function}) : None
-export const useFetch = ({ url = '', data = null, loadEl = null, success = () => {}, error = () => {} }) => {
-  if (!url) console.warn('useFetch: {url}이 없습니다.');
-  let _data;
-  let _loadEl;
-
-  if (data) {
-    _data = new FormData();
-    let keys = Object.keys(data);
-    keys.forEach(key => _data.append(key, data[key]))
-  } else {
-    _data = null;
+// REST API request = {url: String, method: String, data: Object, start: Function, success: Function, error: Function}
+export const useRest = ( request ) => {
+  if (typeof(request) == 'string') {
+    return console.warn('The useRest parameter is an Object!');
   }
+  let url = request.url ?? null;
+  let method = request.method ?? 'GET';
+  let data = request.data ?? null;
+  let start = request.start ?? function(){};
+  let success = request.success ?? function(){};
+  let error = request.error ?? function(){};
 
-  if (loadEl) {
-    _loadEl = document.querySelector(loadEl);
-    _loadEl.style.display = 'block';
+  if (!url) console.warn('useRest: {url}이 없습니다.');
+  start(data);
+  switch (method) {
+    case 'GET':
+      fetch(url).then(res => {
+        if (!res.ok) {
+          error();
+          return console.warn('Request Error!');
+        }
+        return res.json();
+      }).then(resData => {
+        success(resData);
+      }).catch(resData => {
+        error(resData);
+      });
+      break;
+    case 'POST':
+      fetch(url, {
+        method: method,
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data),
+      }).then(res => {
+        if (!res.ok) {
+          error();
+          return console.warn('Request Error!');
+        }
+        return res.json();
+      }).then(resData => {
+        success(resData);
+      }).catch(resData => {
+        error(resData);
+      });
+      break;
+    case 'PUT':
+      fetch(url, {
+        method: method,
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data),
+      }).then(res => {
+        if (!res.ok) {
+          error();
+          return console.warn('Request Error!');
+        }
+        return res.json();
+      }).then(resData => {
+        success(resData);
+      }).catch(resData => {
+        error(resData);
+      });
+      break;
+    case 'DELETE':
+      fetch(url, {
+        method: method,
+      }).then(res => {
+        if (!res.ok) {
+          error();
+          return console.warn('Request Error!');
+        }
+        return res.json();
+      }).then(resData => {
+        success(resData);
+      }).catch(resData => {
+        error(resData);
+      });
+      break;
   }
-
-  fetch(url, {method: 'POST', body: _data}).then(
-    res => {
-      if (loadEl) _loadEl.style.display = 'none';
-      if (res.status !== 200) {
-        error({result: 'Fail', reason: 'Response Error'});
-        return;
-      }
-      return res.text();
-    }
-  ).catch(
-    err => error(err ?? {result: 'Fail', reason: 'Request Error'})
-  ).then(
-    text => success(text ?? {result: 'Success', data: text})
-  )
 }
 
 // FadeIn 함수 (element:String, duration:Number) : None
