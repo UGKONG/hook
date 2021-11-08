@@ -343,5 +343,9 @@ export const useSendValidation = (el = null, errFn = () => {}, param1 = null, pa
   return false;
 }
 
-
+// Element 위치 구하기
+export const useOffsetY = (el = {}) => {
+  if (!el.tagName) return console.warn('el is undefined!');
+  return el.getBoundingClientRect().top;
+}
 
