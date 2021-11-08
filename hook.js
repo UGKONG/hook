@@ -250,6 +250,43 @@ export const useMaxArr = (arr = [], prop = '') => {
   return Number(maxValue);
 }
 
+// 배열의 프로퍼티 value 정렬 후 리스트 반환 (arr: 배열, prop: KeyName, sort: 오름/내림차순, type: number/string)
+export const useOrderArr = (arr = [], prop = null, sort = 'up', type = 'number') => {
+  let tempArr = [...arr];
+
+  if (!prop) {
+    switch (type) {
+      case 'number':
+        return sort == 'up' ? (
+          tempArr.sort((a, b) => Number(a) - Number(b))
+        ) : (
+          tempArr.sort((a, b) => Number(b) - Number(a))
+        );
+      case 'string':
+        return sort == 'up' ? (
+          tempArr.sort((a, b) => a < b ? -1 : a > b ? 1 : 0)
+        ) : (
+          tempArr.sort((a, b) => a > b ? -1 : a < b ? 1 : 0)
+        );
+    }
+  } else {
+    switch (type) {
+      case 'number':
+        return sort == 'up' ? (
+          tempArr.sort((a, b) => Number(a[prop]) - Number(b[prop]))
+        ) : (
+          tempArr.sort((a, b) => Number(b[prop]) - Number(a[prop]))
+        );
+      case 'string':
+        return sort == 'up' ? (
+          tempArr.sort((a, b) => a[prop] < b[prop] ? -1 : a[prop] > b[prop] ? 1 : 0)
+        ) : (
+          tempArr.sort((a, b) => a[prop] > b[prop] ? -1 : a[prop] < b[prop] ? 1 : 0)
+        );
+    }
+  }
+}
+
 // 파일 사이즈 반환
 export const useFileSize = (size) => {
   let result = 0;
@@ -269,3 +306,42 @@ export const useFileSize = (size) => {
   }
   return Number(result).toFixed(2) + ext;
 }
+
+// 날짜 Validation (a: Element, b: Element)
+export const useDateValidation = (startEl = {}, endEl = {}) => {
+  if (startEl.value == '' || endEl.value == '') return null;
+  let start = startEl.value;
+  let end = endEl.value;
+  start = new Date(start);
+  end = new Date(end);
+  
+  start.setHours(0); end.setHours(0);
+  start.setMinutes(0); end.setMinutes(0);
+  start.setSeconds(0); end.setSeconds(0);
+  start.setMilliseconds(0); end.setMilliseconds(0);
+
+  return end - start < 0 ? false : true;
+}
+
+// 게시글 등록/수정 Validation (el: Element, callbackFn: Function)
+export const useSendValidation = (el = null, errFn = () => {}, param1 = null, param2 = null, param3 = null) => {
+  if (!el) return console.error('"el" is null!');
+  if (Array.isArray(el)) {
+    for(let i of el) {
+      let val = typeof(i) != 'object' ? i : i.value;
+      if (val == '') {
+        errFn(i, param1, param2, param3);
+        return false;
+      }
+    }
+    return true;
+  }
+  let val = typeof(el) != 'object' ? el : el.value;
+  if (val != '') return true;
+  if (typeof(el) != 'object') return false;
+  errFn(el, param1, param2, param3);
+  return false;
+}
+
+
+
