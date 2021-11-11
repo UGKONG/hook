@@ -1,3 +1,4 @@
+/* eslint-disable default-case */
 // REST API request = {url: String, method: String, data: Object, start: Function, success: Function, error: Function}
 export const useRest = ( request ) => {
   if (typeof(request) == 'string') {
@@ -216,6 +217,19 @@ export const useElement = (tag = 'div', attr = null, template = '', target = nul
   }
 }
 
+// GET파라미터 스트링변환
+export const useQueryString = (dataObject = {}) => {
+  let resultStr = '';
+  let keys = Object.keys(dataObject);
+  keys.forEach((key, idx) => {
+    resultStr += idx == 0 ? '?' : '';
+    resultStr += key + '=' + dataObject[key];
+    resultStr += keys.length - 1 == idx ? '' : '&';
+  });
+  console.log(resultStr);
+
+  return resultStr;
+}
 // GET파라미터 객체변환
 export const useQueryObject = (dataString = '') => {
   // db_table=dt_Introduce&htmlSeq=15
@@ -246,8 +260,7 @@ export const useMaxArr = (arr = [], prop = '') => {
   let temp = arr.sort((a, b) => Number(a[prop]) - Number(b[prop]));
   if (temp.length == 0) return 0;
   let maxObj = temp[temp.length - 1];
-  let maxValue = maxObj[prop];
-  return Number(maxValue);
+  return maxObj;
 }
 
 // 배열의 프로퍼티 value 정렬 후 리스트 반환 (arr: 배열, prop: KeyName, sort: 오름/내림차순, type: number/string)
@@ -348,4 +361,3 @@ export const useOffsetY = (el = {}) => {
   if (!el.tagName) return console.warn('el is undefined!');
   return el.getBoundingClientRect().top;
 }
-
