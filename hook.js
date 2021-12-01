@@ -1,4 +1,50 @@
 /* eslint-disable default-case */
+
+export const useFetch = ( _url = '/', task = '', _params = {}, _success = null, _error = null, options = false) => {
+  let params = {..._params};
+  let formData = new FormData();
+  let keys = Object.keys(params);
+  
+  keys.forEach(key => {
+    if (options) {
+      if (Array.isArray(params[key])) {
+        params[key].forEach(data => formData.append(key, data));
+      } else {
+        formData.append(key, params[key]);
+      }
+    } else {
+      formData.append(key, JSON.stringify(params[key]));
+    }
+  });
+  formData.append('TASK', task);
+
+  fetch(_url, {
+    method: 'POST',
+    // headers: {'Content-Type': 'multipart/form-data'},
+    body: formData,
+  }).then(res => {
+    if (!res.ok) {
+      if (!_error) return console.warn('Response Error!');
+      console.log('res', res);
+      _error();
+    }
+    
+    return res.json();
+  }).then(resData => {
+    if (!_success) {
+      console.info('Success! But success function is null!');
+      console.log(resData);
+    } else {
+      _success(resData);
+    }
+  }).catch((err) => {
+    if (!_error) return console.warn('Request Error!');
+    console.error('err', err);
+    _error(err);
+  });
+}
+
+
 // REST API request = {url: String, method: String, data: Object, start: Function, success: Function, error: Function}
 export const useRest = ( request ) => {
   if (typeof(request) == 'string') {
@@ -30,8 +76,7 @@ export const useRest = ( request ) => {
     case 'POST':
       fetch(url, {
         method: method,
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(data),
+        body: new URLSearchParams(data),
       }).then(res => {
         if (!res.ok) {
           error();
@@ -47,8 +92,7 @@ export const useRest = ( request ) => {
     case 'PUT':
       fetch(url, {
         method: method,
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(data),
+        body: new URLSearchParams(data),
       }).then(res => {
         if (!res.ok) {
           error();
@@ -64,6 +108,7 @@ export const useRest = ( request ) => {
     case 'DELETE':
       fetch(url, {
         method: method,
+        body: new URLSearchParams(data),
       }).then(res => {
         if (!res.ok) {
           error();
@@ -226,7 +271,6 @@ export const useQueryString = (dataObject = {}) => {
     resultStr += key + '=' + dataObject[key];
     resultStr += keys.length - 1 == idx ? '' : '&';
   });
-  console.log(resultStr);
 
   return resultStr;
 }
@@ -321,7 +365,8 @@ export const useFileSize = (size) => {
 }
 
 // 날짜 Validation (a: Element, b: Element)
-export const useDateValidation = (startEl = {}, endEl = {}) => {
+export const useDateValidation = (startEl = null, endEl = null, callbackFn = () => {}) => {
+  if (!startEl || !endEl) return console.warn('Start Date or End Date is Null!');
   if (startEl.value == '' || endEl.value == '') return null;
   let start = startEl.value;
   let end = endEl.value;
@@ -333,7 +378,12 @@ export const useDateValidation = (startEl = {}, endEl = {}) => {
   start.setSeconds(0); end.setSeconds(0);
   start.setMilliseconds(0); end.setMilliseconds(0);
 
-  return end - start < 0 ? false : true;
+  let result = end - start < 0 ? false : true;
+  
+  if (!result) {
+    callbackFn(result);
+  }
+  return result;
 }
 
 // 게시글 등록/수정 Validation (el: Element, callbackFn: Function)
@@ -343,6 +393,7 @@ export const useSendValidation = (el = null, errFn = () => {}, param1 = null, pa
     for(let i of el) {
       let val = typeof(i) != 'object' ? i : i.value;
       if (val == '') {
+        if (typeof(i) == 'object') i.focus();
         errFn(i, param1, param2, param3);
         return false;
       }
@@ -360,4 +411,9 @@ export const useSendValidation = (el = null, errFn = () => {}, param1 = null, pa
 export const useOffsetY = (el = {}) => {
   if (!el.tagName) return console.warn('el is undefined!');
   return el.getBoundingClientRect().top;
+}
+
+// 검색어 변환
+export const useSearchText = (value = '') => {
+  return value.replaceAll(' ', '').toLowerCase();
 }
