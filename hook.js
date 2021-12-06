@@ -455,7 +455,6 @@ export const useAlert = {
       progress: 'rgb(61 52 52)'
     }
   },
-  alertTimeout: undefined,
   style () {
     return `
       <style>
@@ -539,7 +538,7 @@ export const useAlert = {
       </style>
     `;
   },
-  init (skin = this.skin.info, title = this.title, text = this.text, timer = 3000) {
+  init (skin = this.skin.info, title = this.title, text = this.text) {
     let count = document.querySelectorAll('section[alert]').length;
     let dom = document.createElement('section');
     dom.setAttribute('alert', '');
@@ -564,34 +563,34 @@ export const useAlert = {
       dom.style.top = 80 * count + 10 + 'px';
       progress.style.width = '100%';
     }, 0);
-    this.autoClose(dom, timer);
+    this.autoClose(dom);
   },
-  info (title, text, timer) {
-    this.init(this.skin.info, title, text, timer);
+  info (title, text) {
+    this.init(this.skin.info, title, text);
   },
-  success (title, text, timer) {
-    this.init(this.skin.success, title, text, timer);
+  success (title, text) {
+    this.init(this.skin.success, title, text);
   },
-  warn (title, text, timer) {
-    this.init(this.skin.warn, title, text, timer);
+  warn (title, text) {
+    this.init(this.skin.warn, title, text);
   },
-  error (title, text, timer) {
-    this.init(this.skin.error, title, text, timer);
+  error (title, text) {
+    this.init(this.skin.error, title, text);
   },
-  other (title, text, timer) {
-    this.init(this.skin.other, title, text, timer);
+  other (title, text) {
+    this.init(this.skin.other, title, text);
   },
   close (el) {
     el.style.top = '-100px';
     el.style.transitionDelay = '0s';
     window.setTimeout(() => el.remove(), 300);
   },
-  autoClose (el, timer) {
+  autoClose (el) {
     window.setTimeout(() => {
-      el.style.transitionDelay = timer / 1000 + 's';
+      el.style.transitionDelay = '3s';
       el.style.top = '-100px';
       el.style.transitionDelay = '0s';
-    }, timer);
-    window.setTimeout(() => el.remove(), timer + 300);
+    }, 3000);
+    window.setTimeout(() => el.remove(), 3300);
   },
 }
