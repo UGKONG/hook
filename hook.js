@@ -238,13 +238,14 @@ export const useMonthSpan = (dt = new Date()) => {
   let TODAY = useDateFormat(dt);
   let date = new Date(dt);
   date.setDate(1);
+  let START_DAY = date.getDay();
   let START_DT = useDateFormat(date);
   date.setMonth(date.getMonth() + 1);
   date.setDate(1);
   date.setDate(date.getDate() - 1);
   let END_DT = useDateFormat(date);
 
-  return [START_DT, END_DT, TODAY];
+  return [START_DT, END_DT, TODAY, START_DAY];
 }
 
 // 프레임워크 사용X 컴포넌트 제작 함수 (tag:String, attr:Object, template:String, target:Element)
@@ -416,4 +417,181 @@ export const useOffsetY = (el = {}) => {
 // 검색어 변환
 export const useSearchText = (value = '') => {
   return value.replaceAll(' ', '').toLowerCase();
+}
+
+// 알림창 띄우기
+export const useAlert = {
+  title: 'Example Title',
+  text: 'Example Description',
+  skin: {
+    info: {
+      icon: 'fas fa-info-circle',
+      txt: '#f8f9fb',
+      bg: '#0c86eb',
+      progress: 'rgb(12,117,204)'
+    },
+    success: {
+      icon: 'fas fa-check-circle',
+      txt: '#f8f9fb',
+      bg: '#54ac3b',
+      progress: 'rgb(65 158 38)'
+    },
+    warn: {
+      icon: 'fas fa-exclamation-triangle',
+      txt: '#353a40',
+      bg: '#feb100',
+      progress: 'rgb(196 140 11)'
+    },
+    error: {
+      icon: 'fas fa-times',
+      txt: '#f8f9fb',
+      bg: '#ff395a',
+      progress: 'rgb(214 41 70)'
+    },
+    other: {
+      icon: 'fas fa-question',
+      txt: '#f8f9fb',
+      bg: '#464646',
+      progress: 'rgb(61 52 52)'
+    }
+  },
+  alertTimeout: undefined,
+  style () {
+    return `
+      <style>
+        section[alert] {
+          position: fixed;
+          top: -100px;
+          right: 10px;
+          width: 400px;
+          height: 70px;
+          background-color: #fff;
+          border-radius: 4px;
+          box-shadow: 0px 2px 6px #00000050;
+          z-index: 99999999999999999999999999;
+          transition-duration: .4s;
+          overflow: hidden;
+        }
+        section[alert] > .wrap {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: space-between;
+          padding: 10px;
+        }
+        section[alert] > .wrap > .icon {
+          width: 50px;
+          min-width: 50px;
+          font-size: 34px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        section[alert] > .wrap > .context {
+          padding: 0 10px;
+          width: calc(100% - 64px);
+        }
+        section[alert] > .wrap > .context > .title {
+          font-weight: 500;
+          letter-spacing: .5px;
+          height: 50%;
+        }
+        section[alert] > .wrap > .context > .text {
+          font-size: 13px;
+          height: 50%;
+          display: flex;
+          align-items: center;
+          padding-bottom: 3px;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+        section[alert] .progress {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 4px;
+          margin: 0;
+          background-color: #eeeeee50;
+        }
+        section[alert] .progress > div {
+          width: 0%;
+          height: 100%;
+          transition: 2.5s;
+        }
+        section[alert] .xBtn {
+          width: 14px;
+          height: 14px;
+          background: transparent;
+          border: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+          opacity: .6;
+        }
+        section[alert] .xBtn:hover {
+          box-shadow: none;
+          opacity: 1;
+        }
+      </style>
+    `;
+  },
+  init (skin = this.skin.info, title = this.title, text = this.text, timer = 3000) {
+    let count = document.querySelectorAll('section[alert]').length;
+    let dom = document.createElement('section');
+    dom.setAttribute('alert', '');
+    dom.style.backgroundColor = skin.bg;
+    dom.style.color = skin.txt;
+    dom.style.top = '-100px';
+    dom.innerHTML = `
+      <div class="wrap">
+        <div class="icon"><i class="${skin.icon}"></i></div>
+        <div class="context"><p class="title">${title}</p><p class="text">${text}</p></div>
+        <button class="xBtn"><i class="fas fa-times"></i></button>
+        <article class="progress"><div style="
+          background-color: ${skin.progress}
+        "></div>
+      </div>${this.style()}
+    `;
+    document.body.appendChild(dom);
+    let xBtn = dom.children[0].children[2];
+    let progress = dom.children[0].children[3].children[0];
+    xBtn.onclick = () => this.close(dom);
+    window.setTimeout(() => {
+      dom.style.top = 80 * count + 10 + 'px';
+      progress.style.width = '100%';
+    }, 0);
+    this.autoClose(dom, timer);
+  },
+  info (title, text, timer) {
+    this.init(this.skin.info, title, text, timer);
+  },
+  success (title, text, timer) {
+    this.init(this.skin.success, title, text, timer);
+  },
+  warn (title, text, timer) {
+    this.init(this.skin.warn, title, text, timer);
+  },
+  error (title, text, timer) {
+    this.init(this.skin.error, title, text, timer);
+  },
+  other (title, text, timer) {
+    this.init(this.skin.other, title, text, timer);
+  },
+  close (el) {
+    el.style.top = '-100px';
+    el.style.transitionDelay = '0s';
+    window.setTimeout(() => el.remove(), 300);
+  },
+  autoClose (el, timer) {
+    window.setTimeout(() => {
+      el.style.transitionDelay = timer / 1000 + 's';
+      el.style.top = '-100px';
+      el.style.transitionDelay = '0s';
+    }, timer);
+    window.setTimeout(() => el.remove(), timer + 300);
+  },
 }
