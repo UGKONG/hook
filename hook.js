@@ -44,7 +44,6 @@ export const useFetch = ( _url = '/', task = '', _params = {}, _success = null, 
   });
 }
 
-
 // REST API request = {url: String, method: String, data: Object, start: Function, success: Function, error: Function}
 export const useRest = ( request ) => {
   if (typeof(request) == 'string') {
@@ -233,7 +232,7 @@ export const usePwDecoding = (str = '') => {
   return str;
 }
 
-// 해당 월 (dt: Object) : String[]
+// 해당 월 첫날 끝날 오늘 첫날 요일 (dt: Object) : String[]
 export const useMonthSpan = (dt = new Date()) => {
   let TODAY = useDateFormat(dt);
   let date = new Date(dt);
@@ -350,17 +349,21 @@ export const useFileSize = (size) => {
   let result = 0;
   let ext = '';
   let n = 1024;
-  if (size >= n) {
-    result = size / n;
+  if (Number(size) >= n) {
+    result = Number(size) / n;
     ext = 'KB';
   }
-  if (size >= n * n) {
-    result = size / n / n;
+  if (Number(size) >= n * n) {
+    result = Number(size) / n / n;
     ext = 'MB';
   }
-  if (size >= n * n * n) {
-    result = size / n / n / n;
+  if (Number(size) >= n * n * n) {
+    result = Number(size) / n / n / n;
     ext = 'GB';
+  }
+  if (Number(size) >= n * n * n * n) {
+    result = Number(size) / n / n / n / n;
+    ext = 'TB';
   }
   return Number(result).toFixed(2) + ext;
 }
@@ -594,3 +597,62 @@ export const useAlert = {
     window.setTimeout(() => el.remove(), 3300);
   },
 }
+
+
+// 세션 스토리지 (GET, POST, PUT)
+export const useSession = (key = null, value) => {
+  if (!key || typeof(key) != 'string') return console.warn('useSession key is Null!!');
+  if (value == undefined) return window.sessionStorage[key];
+  
+  window.sessionStorage.setItem(key, value);
+  return window.sessionStorage[key];
+}
+
+// 세션 스토리지 (DELETE)
+export const useRemoveSession = (key) => {
+  if (!key || typeof(key) != 'string') return console.warn('delSession key is Null!!');
+  window.sessionStorage.removeItem(key);
+
+  return window.sessionStorage;
+}
+
+// 로컬 스토리지 (GET, POST, PUT)
+export const useLocal = (key = null, value) => {
+  if (!key || typeof(key) != 'string') return console.warn('useSession key is Null!!');
+  if (value == undefined) return window.localStorage[key];
+  
+  window.localStorage.setItem(key, value);
+  return window.localStorage[key];
+}
+
+// 로컬 스토리지 (DELETE)
+export const useRemoveLocal = (key) => {
+  if (!key || typeof(key) != 'string') return console.warn('delSession key is Null!!');
+  window.localStorage.removeItem(key);
+
+  return window.localStorage;
+}
+
+// 파일 다운로드
+export const useDownload = (url = '/', name = null) => {
+  const a = document.createElement('a');
+  let fileName = name;
+  if (!name) {
+    let date = new Date();
+    let Y = date.getFullYear();
+    let M = date.getMonth() < 10 ? '0' + date.getMonth() : date.getMonth();
+    let D = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+    let h = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+    let m = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+    let s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
+    fileName = Y + M + D + h + m + s;
+  }
+  a.setAttribute('href', url);
+  a.setAttribute('download', fileName);
+  a.setAttribute('target', 'new');
+  a.setAttribute('type', 'application/octet-stream');
+  a.click();
+  a.remove();
+  return url;
+}
+
