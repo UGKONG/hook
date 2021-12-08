@@ -670,7 +670,8 @@ export const useForm = (data = {}) => {
   let keys = Object.keys(data);
   let form = new FormData();
   keys.forEach((key) => {
-    form.append(key, data[key]);
+    let value = Array.isArray(data[key]) ? JSON.stringify(data[key]) : data[key];
+    form.append(key, value);
   });
 
   return form;
