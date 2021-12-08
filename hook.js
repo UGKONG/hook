@@ -656,3 +656,9 @@ export const useDownload = (url = '/', name = null) => {
   return url;
 }
 
+// 딜레이 함수
+export const useDelay = (duration) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => resolve(true), duration);
+  });
+}
