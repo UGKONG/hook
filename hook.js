@@ -662,3 +662,16 @@ export const useDelay = (duration) => {
     setTimeout(() => resolve(true), duration);
   });
 }
+
+// FormData 리턴 함수
+export const useForm = (data = {}) => {
+  if (typeof(data) != 'object') return console.warn('data is not object!!');
+
+  let keys = Object.keys(data);
+  let form = new FormData();
+  keys.forEach((key) => {
+    form.append(key, data[key]);
+  });
+
+  return form;
+}
