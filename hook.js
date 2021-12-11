@@ -1,4 +1,10 @@
 /* eslint-disable default-case */
+export const useEl = (el) => {
+  return document.querySeletctor(el);
+}
+export const useEls = (el) => {
+  return document.querySeletctorAll(el);
+}
 
 export const useFetch = ( _url = '/', task = '', _params = {}, _success = null, _error = null, options = false) => {
   let params = {..._params};
