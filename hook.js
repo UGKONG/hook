@@ -1,10 +1,7 @@
 /* eslint-disable default-case */
-export const useEl = (el) => {
-  return document.querySeletctor(el);
-}
-export const useEls = (el) => {
-  return document.querySeletctorAll(el);
-}
+NodeList.prototype.all = function (fn) {this.forEach((el, idx) => fn(el, idx))}
+export const useEl = (el = null) => document.querySelector(el);
+export const useEls = (el = null) => document.querySelectorAll(el);
 
 export const useFetch = ( _url = '/', task = '', _params = {}, _success = null, _error = null, options = false) => {
   let params = {..._params};
@@ -26,7 +23,6 @@ export const useFetch = ( _url = '/', task = '', _params = {}, _success = null, 
 
   fetch(_url, {
     method: 'POST',
-    // headers: {'Content-Type': 'multipart/form-data'},
     body: formData,
   }).then(res => {
     if (!res.ok) {
@@ -669,7 +665,7 @@ export const useDelay = (duration) => {
   });
 }
 
-// FormData 리턴 함수
+// FormData 리턴함수
 export const useForm = (data = {}) => {
   if (typeof(data) != 'object') return console.warn('data is not object!!');
 
